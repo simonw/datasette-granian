@@ -3,6 +3,16 @@ from granian.server import Granian
 from granian.constants import HTTPModes, Interfaces, Loops, ThreadModes
 from granian.log import LogLevels
 import click
+import json
+
+
+def load_app(target):
+    from datasette import cli
+
+    ds_kwargs = json.loads(target)
+    ds = cli.serve.callback(**ds_kwargs)
+    return ds.app()
+
 
 invalid_options = {
     "get",
@@ -26,10 +36,10 @@ def serve_with_granian(**kwargs):
     # Need to add back default kwargs for everything in invalid_options:
     kwargs.update({invalid_option: None for invalid_option in invalid_options})
     kwargs["return_instance"] = True
-    ds = cli.serve.callback(**kwargs)
-    app = ds.app()
-    Granian(
-        app,
+
+    srv = Granian(
+        # Pass kwars as serialized JSON to the subprocess
+        json.dumps(kwargs),
         address=host,
         port=port,
         interface=Interfaces.ASGI,
@@ -44,7 +54,8 @@ def serve_with_granian(**kwargs):
         log_level=LogLevels.info.value,
         ssl_cert=None,
         ssl_key=None,
-    ).serve()
+    )
+    srv.serve(target_loader=load_app)
 
 
 @hookimpl
