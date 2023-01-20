@@ -15,7 +15,16 @@ Install this plugin in the same environment as Datasette.
 
 ## Usage
 
-Usage instructions go here.
+Run `datasette granian ...` instead of `datasette serve ...` - most options should remain the same.
+
+```
+% datasette granian fixtures.db content.db --crossdb
+[INFO] Starting granian
+[INFO] Listening at: 127.0.0.1:8001
+[INFO] Booting worker-1 with pid: 92793
+[INFO] Started worker-1
+[INFO] Started worker-1 runtime-1
+```
 
 ## Development
 
