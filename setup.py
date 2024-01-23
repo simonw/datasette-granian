@@ -33,6 +33,6 @@ setup(
     packages=["datasette_granian"],
     entry_points={"datasette": ["granian = datasette_granian"]},
     install_requires=["datasette", "granian"],
-    extras_require={"test": ["pytest", "pytest-asyncio"]},
-    python_requires=">=3.7",
+    extras_require={"test": ["pytest", "pytest-asyncio", "datasette-test"]},
+    python_requires=">=3.8",
 )

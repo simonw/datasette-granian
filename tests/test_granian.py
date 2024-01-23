@@ -1,11 +1,33 @@
-from datasette.app import Datasette
+from datasette_test import wait_until_responds
+import httpx
 import pytest
+from subprocess import Popen, PIPE
+import sys
 
 
-@pytest.mark.asyncio
-async def test_plugin_is_installed():
-    datasette = Datasette(memory=True)
-    response = await datasette.client.get("/-/plugins.json")
+@pytest.fixture(scope="session")
+def server():
+    process = Popen(
+        [
+            sys.executable,
+            "-m",
+            "datasette",
+            "granian",
+            "--port",
+            "8126",
+            "--memory",
+        ],
+        stdout=PIPE,
+    )
+    wait_until_responds("http://localhost:8126/")
+    yield "http://localhost:8126"
+    process.terminate()
+    process.wait()
+
+
+def test_granian(server):
+    response = httpx.get(server + "/-/versions.json")
     assert response.status_code == 200
-    installed_plugins = {p["name"] for p in response.json()}
-    assert "datasette-granian" in installed_plugins
+    info = response.json()
+    assert "python" in info
+    assert "datasette" in info
